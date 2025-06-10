@@ -23,23 +23,19 @@ module.exports = async (req, res) => {
       return res.status(400).json({
         error: 'Missing URL parameter',
         example: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/download?url=TIKTOK_URL`,
-        developer: {
-          name: "NK KA",
-          telegram: "t.me/nkka404",
-          message: "For support and custom API development"
-        }
+        developer: "t.me/nkka404"
       });
     }
 
     // Handle shortened URLs
     if (url.includes('vt.tiktok.com') || url.includes('vm.tiktok.com')) {
       try {
-        const response = await axios.head(url, {
+        const response = await axios.get(url, {
           maxRedirects: 0,
           validateStatus: (status) => status >= 200 && status < 400
         });
-        if (response.headers.location) {
-          url = response.headers.location;
+        if (response.request.res.responseUrl) {
+          url = response.request.res.responseUrl;
         }
       } catch (error) {
         console.error('Error resolving short URL:', error);
@@ -55,18 +51,14 @@ module.exports = async (req, res) => {
     if (!tiktokRegex.test(url)) {
       return res.status(400).json({ 
         error: 'Invalid TikTok URL',
-        developer: {
-          name: "NK KA",
-          telegram: "t.me/nkka404",
-          note: "Please provide a valid TikTok URL"
-        }
+        developer: "t.me/nkka404"
       });
     }
 
-    // Fetch TikTok page
+    // Fetch TikTok page with mobile user agent to get direct video URL
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Mobile Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
       }
     });
@@ -75,6 +67,16 @@ module.exports = async (req, res) => {
     const scriptContent = $('script#__UNIVERSAL_DATA_FOR_REHYDRATION__').html();
     
     if (!scriptContent) {
+      // Alternative method to extract video URL
+      const videoUrlMatch = response.data.match(/playAddr":"(https:\\\/\\\/[^"]+)/);
+      if (videoUrlMatch) {
+        const playableUrl = videoUrlMatch[1].replace(/\\\//g, '/');
+        return res.status(200).json({
+          status: 'success',
+          playable_url: playableUrl,
+          developer: "t.me/nkka404"
+        });
+      }
       return res.status(500).json({ 
         error: 'Could not extract video data',
         developer: "t.me/nkka404" 
@@ -84,62 +86,41 @@ module.exports = async (req, res) => {
     const jsonData = JSON.parse(scriptContent);
     const videoData = jsonData.__DEFAULT_SCOPE__['webapp.video-detail'].itemInfo.itemStruct;
 
-    // Beautifully formatted response
-    const result = {
+    // Get direct playable URL (fix for playback issue)
+    let playableUrl = videoData.video.playAddr;
+    if (!playableUrl.startsWith('http')) {
+      playableUrl = videoData.video.downloadAddr;
+    }
+    
+    // Ensure URL is properly formatted
+    playableUrl = playableUrl.replace(/\\\//g, '/');
+
+    // Response with playable URL
+    res.status(200).json({
       status: 'success',
-      request_url: url,
-      timestamp: new Date().toISOString(),
-      developer: {
-        name: "NK KA",
-        telegram: "t.me/nkka404",
-        website: "https://github.com/nkka404",
-        message: "Thank you for using this API!"
-      },
+      developer: "t.me/nkka404",
       video_info: {
         id: videoData.id,
         description: videoData.desc,
-        created_at: new Date(videoData.createTime * 1000).toISOString(),
         duration: `${videoData.video.duration} seconds`,
-        author: {
-          username: `@${videoData.author.uniqueId}`,
-          nickname: videoData.author.nickname,
-          avatar: videoData.author.avatarThumb,
-          verified: videoData.author.verified
-        },
-        statistics: {
-          likes: videoData.stats.diggCount.toLocaleString(),
-          comments: videoData.stats.commentCount.toLocaleString(),
-          shares: videoData.stats.shareCount.toLocaleString(),
-          views: videoData.stats.playCount.toLocaleString()
-        },
-        music: {
-          title: videoData.music.title || "Original Sound",
-          author: videoData.music.authorName || videoData.author.nickname,
-          url: videoData.music.playUrl
-        },
-        video_urls: {
-          with_watermark: videoData.video.playAddr,
-          without_watermark: `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}`,
-          cover_image: videoData.video.cover,
-          dynamic_cover: videoData.video.dynamicCover
-        }
+        author: `@${videoData.author.uniqueId}`,
+        music: videoData.music.title || "Original Sound"
       },
-      download_options: {
-        note: "For best results, use the without_watermark URL",
-        tips: "Add '?download=1' to force download instead of streaming"
-      }
-    };
-
-    res.status(200).json(result);
+      urls: {
+        play_directly: playableUrl,
+        download_no_watermark: `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}`,
+        cover_image: videoData.video.cover.replace(/\\\//g, '/')
+      },
+      note: "Use the 'play_directly' URL for immediate playback in browsers/media players"
+    });
 
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({
       status: 'error',
       message: 'Failed to process TikTok video',
-      error_details: error.message,
       support: "Contact t.me/nkka404 for assistance",
-      timestamp: new Date().toISOString()
+      error_details: error.message
     });
   }
 };
