@@ -1,0 +1,17 @@
+{
+  "name": "youtube-downloader-api",
+  "version": "1.0.0",
+  "main": "api/youtube.js",
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "next-connect": "^0.12.1",
+    "ytdl-core": "^4.11.0",
+    "ytsr": "^3.5.3",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "@vercel/node": "^1.12.1"
+  }
+}
