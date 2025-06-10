@@ -1,17 +1,17 @@
 {
   "version": 2,
+  "public": false,
+  "builds": [
+    {
+      "src": "api/download.js",
+      "use": "@vercel/node"
+    }
+  ],
   "routes": [
     {
-      "src": "/api/youtube/search",
-      "dest": "/api/youtube/search"
-    },
-    {
-      "src": "/api/youtube/info",
-      "dest": "/api/youtube/info"
-    },
-    {
-      "src": "/api/youtube/download",
-      "dest": "/api/youtube/download"
+      "src": "/api/download",
+      "methods": ["GET", "OPTIONS"],
+      "dest": "/api/download.js"
     }
   ]
 }
