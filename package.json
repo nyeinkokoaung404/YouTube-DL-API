@@ -1,8 +1,16 @@
 {
-  "name": "youtube-downloader-api",
+  "name": "tiktok-downloader-api",
   "version": "1.0.0",
+  "description": "TikTok Downloader API for Vercel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
-    "ytdl-core": "^4.11.0",
-    "ytsr": "^3.5.3"
+    "axios": "^0.27.2",
+    "cheerio": "^1.0.0-rc.12"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
