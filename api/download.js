@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
       return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { url } = req.query;
+    let { url } = req.query;
 
     if (!url) {
       return res.status(400).json({
@@ -27,15 +27,35 @@ module.exports = async (req, res) => {
       });
     }
 
-    // Validate TikTok URL
-    if (!url.match(/https?:\/\/(www\.)?tiktok\.com\/@.+\/video\/\d+/)) {
+    // Handle shortened TikTok URLs (vt.tiktok.com)
+    if (url.includes('vt.tiktok.com')) {
+      try {
+        // Follow the redirect to get the full URL
+        const response = await axios.head(url, {
+          maxRedirects: 0,
+          validateStatus: (status) => status >= 200 && status < 400
+        });
+        
+        if (response.headers.location) {
+          url = response.headers.location;
+        }
+      } catch (error) {
+        console.error('Error resolving short URL:', error);
+        return res.status(400).json({ error: 'Failed to resolve shortened TikTok URL' });
+      }
+    }
+
+    // Validate TikTok URL (now accepts both formats)
+    const tiktokRegex = /https?:\/\/(www\.|vm\.|vt\.)?tiktok\.com\/(@.+\/video\/\d+|[\w-]+\/?)/;
+    if (!tiktokRegex.test(url)) {
       return res.status(400).json({ error: 'Invalid TikTok URL' });
     }
 
     // Fetch the TikTok page
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
       }
     });
 
