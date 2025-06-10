@@ -1,15 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/youtube.js",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
-      "src": "/api/youtube/(.*)",
-      "dest": "/api/youtube"
+      "src": "/api/youtube/search",
+      "dest": "/api/youtube/search"
+    },
+    {
+      "src": "/api/youtube/info",
+      "dest": "/api/youtube/info"
+    },
+    {
+      "src": "/api/youtube/download",
+      "dest": "/api/youtube/download"
     }
   ]
 }
