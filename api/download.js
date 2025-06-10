@@ -1,12 +1,13 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const { PassThrough } = require('stream');
 
 module.exports = async (req, res) => {
   try {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Range');
 
     // Handle OPTIONS request
     if (req.method === 'OPTIONS') {
@@ -20,19 +21,19 @@ module.exports = async (req, res) => {
       });
     }
 
-    let { url, download } = req.query;
+    let { url, download, mobile } = req.query;
 
     if (!url) {
       return res.status(400).json({
         error: 'Missing URL parameter',
-        example: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/download?url=TIKTOK_URL`,
+        example: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/download?url=TIKTOK_URL[&mobile=1]`,
         developer: "t.me/nkka404"
       });
     }
 
     // Handle direct CDN URLs
     if (url.includes('tiktokcdn.com')) {
-      return handleDirectCDNUrl(req, res, url, download === '1');
+      return handleDirectCDNUrl(req, res, url, download === '1', mobile === '1');
     }
 
     // Handle shortened TikTok URLs
@@ -66,7 +67,7 @@ module.exports = async (req, res) => {
     // Fetch TikTok page
     const response = await axios.get(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
         'Referer': 'https://www.tiktok.com/'
       }
@@ -91,7 +92,7 @@ module.exports = async (req, res) => {
       developer: {
         name: "NK KA",
         telegram: "t.me/nkka404",
-        note: "For custom API solutions"
+        note: "Mobile-optimized TikTok API"
       },
       video_info: {
         id: videoData.id,
@@ -102,34 +103,23 @@ module.exports = async (req, res) => {
           username: `@${videoData.author.uniqueId}`,
           nickname: videoData.author.nickname,
           avatar: videoData.author.avatarThumb
-        },
-        statistics: {
-          likes: videoData.stats.diggCount,
-          comments: videoData.stats.commentCount,
-          shares: videoData.stats.shareCount,
-          views: videoData.stats.playCount
-        },
-        music: {
-          title: videoData.music.title || "Original Sound",
-          author: videoData.music.authorName || videoData.author.nickname,
-          url: videoData.music.playUrl
         }
       },
       download_options: {
+        mobile_optimized: {
+          url: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/download?url=${encodeURIComponent(`https://www.tiktok.com/@${videoData.author.uniqueId}/video/${videoData.id}`)}&mobile=1`,
+          note: "Best for mobile devices"
+        },
         no_watermark: {
           url: `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}`,
-          note: "Add '?download=1' to force download"
-        },
-        with_watermark: {
-          url: videoData.video.playAddr,
-          note: "Add '?download=1' to force download"
+          note: "Original quality without watermark"
         }
       }
     };
 
-    if (download === '1') {
-      // Force download by redirecting to the no watermark URL
-      res.redirect(302, result.download_options.no_watermark.url);
+    if (download === '1' || mobile === '1') {
+      // Handle mobile-optimized download
+      return handleMobileDownload(req, res, videoData);
     } else {
       res.status(200).json(result);
     }
@@ -145,12 +135,12 @@ module.exports = async (req, res) => {
   }
 };
 
-async function handleDirectCDNUrl(req, res, url, forceDownload) {
+async function handleDirectCDNUrl(req, res, url, forceDownload, isMobile) {
   try {
     const isAudio = url.includes('mime_type=audio_mpeg');
     
+    // Set appropriate headers
     if (forceDownload) {
-      // Set download headers
       const filename = isAudio ? 'audio.mp3' : 'video.mp4';
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     }
@@ -161,16 +151,27 @@ async function handleDirectCDNUrl(req, res, url, forceDownload) {
       res.setHeader('Content-Type', 'video/mp4');
     }
 
-    // Add required TikTok headers
+    // Mobile-specific optimizations
+    if (isMobile && !isAudio) {
+      res.setHeader('Content-Type', 'video/MP4');
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
+    }
+
+    // Required TikTok headers
     res.setHeader('Referer', 'https://www.tiktok.com/');
-    res.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
+    res.setHeader('User-Agent', isMobile 
+      ? 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
+      : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36');
 
     // Proxy the request with proper headers
     const response = await axios.get(url, {
       responseType: 'stream',
       headers: {
         'Referer': 'https://www.tiktok.com/',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        'User-Agent': isMobile
+          ? 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
+          : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
 
@@ -181,6 +182,46 @@ async function handleDirectCDNUrl(req, res, url, forceDownload) {
     res.status(500).json({
       status: 'error',
       message: 'Failed to process CDN URL',
+      error_details: error.message,
+      support: "Contact t.me/nkka404 for assistance"
+    });
+  }
+}
+
+async function handleMobileDownload(req, res, videoData) {
+  try {
+    const videoUrl = `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}`;
+    
+    // Set mobile-optimized headers
+    res.setHeader('Content-Type', 'video/MP4');
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Cache-Control', 'public, max-age=31536000');
+    res.setHeader('Referer', 'https://www.tiktok.com/');
+    res.setHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36');
+
+    // For better mobile performance, we'll implement chunked streaming
+    const response = await axios.get(videoUrl, {
+      responseType: 'stream',
+      headers: {
+        'Referer': 'https://www.tiktok.com/',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Mobile) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36'
+      }
+    });
+
+    // Create a pass-through stream
+    const passThrough = new PassThrough();
+    
+    // Pipe the response through our stream
+    response.data.pipe(passThrough);
+    
+    // Pipe to response
+    passThrough.pipe(res);
+
+  } catch (error) {
+    console.error('Error handling mobile download:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to process mobile download',
       error_details: error.message,
       support: "Contact t.me/nkka404 for assistance"
     });
