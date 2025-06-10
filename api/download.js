@@ -118,13 +118,19 @@ module.exports = async (req, res) => {
           url: videoData.music.playUrl
         },
         video_urls: {
-          // Removed with_watermark: videoData.video.playAddr,
-          // Removed without_watermark: `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}&mime_type=video/mp4`,
+          // Re-added with_watermark as it often points to a full video stream
+          with_watermark: videoData.video.playAddr,
+          // Re-added without_watermark for full video playback on mobile
+          // This is the primary URL for getting video with audio
+          without_watermark: `https://api2-16-h2.musical.ly/aweme/v1/play/?video_id=${videoData.id}&mime_type=video/mp4`,
           cover_image: videoData.video.cover,
           dynamic_cover: videoData.video.dynamicCover
         }
       },
-      // Removed download_options as direct download URLs are no longer provided
+      download_options: {
+        note: "For best results (video with audio) on mobile devices, use the 'without_watermark' URL.",
+        tips: "To force download instead of streaming, add '?download=1' to the end of the video URL."
+      }
     };
 
     res.status(200).json(result);
