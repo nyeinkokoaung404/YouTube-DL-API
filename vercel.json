@@ -1,17 +1,18 @@
 {
   "version": 2,
-  "public": false,
   "builds": [
     {
-      "src": "api/download.js",
-      "use": "@vercel/node"
+      "src": "app.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
     {
-      "src": "/api/download",
-      "methods": ["GET", "OPTIONS"],
-      "dest": "/api/download.js"
+      "src": "/(.*)",
+      "dest": "app.py"
     }
-  ]
+  ],
+  "env": {
+    "PYTHON_VERSION": "3.9"
+  }
 }
