@@ -1,6 +1,2 @@
-Flask
+flask
 requests
-gunicorn
-python-dotenv
-cachetools
-urllib3
