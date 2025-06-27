@@ -33,7 +33,13 @@ def extract_video_id(url):
 
 @app.route("/")
 def home():
-    return render_template("status.html")
+    try:
+        return render_template("status.html")
+    except Exception as e:
+        return f"Error loading template: {str(e)}", 500
+# @app.route("/")
+# def home():
+    # return render_template("status.html")
 
 @app.route("/dl", methods=["GET"])
 def download():
