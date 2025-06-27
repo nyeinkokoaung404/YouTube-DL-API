@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YouTube Downloader API - @ISmartCoder</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- Favicon: YouTube Icon -->
-    <link rel="icon" href="https://www.youtube.com/favicon.ico" type="image/x-icon">
     <style>
         :root {
             --youtube-red: #FF0000;
@@ -59,115 +57,59 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
+        /* Navbar Styles */
         .navbar {
             background: var(--youtube-red);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
-        .navbar-brand img {
-            height: 40px;
-            border-radius: 5px;
-        }
-        .nav-link {
-            color: #FFF !important;
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .nav-link:hover {
-            color: var(--youtube-accent) !important;
-        }
-
-        .hero {
-            background: url('https://images.unsplash.com/photo-1611162616307-7d0f846e9dc4') no-repeat center/cover;
-            color: #FFF;
-            padding: 100px 0;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--hero-overlay);
-            transition: background-color 0.3s;
-        }
-        .hero h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            position: relative;
-            z-index: 1;
-            animation: fadeInDown 1s ease-out;
-        }
-        .hero p {
-            font-size: 1.2rem;
-            position: relative;
-            z-index: 1;
-            animation: fadeInUp 1s ease-out 0.3s;
-        }
-
-        .status-card {
-            background: var(--card-bg);
-            border-radius: 15px;
-            box-shadow: 0 5px 20px var(--shadow-color);
-            padding: 30px;
-            text-align: center;
-            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+        
+        /* Video Downloads Card Styles */
+        .media-card {
+            background-color: var(--card-bg);
             border: 1px solid var(--border-color);
+            transition: transform 0.3s, background-color 0.3s;
         }
-        .status-card:hover {
-            transform: translateY(-10px);
+        
+        .media-card .card-title {
+            color: var(--text-color);
         }
-        .status-icon {
-            font-size: 3rem;
-            color: var(--youtube-red);
-            animation: pulse 2s infinite;
+        
+        .media-card .text-muted {
+            color: var(--muted-text) !important;
         }
-        .status-text {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 15px 0;
-        }
-
-        .form-section {
-            background: var(--section-bg);
-            padding: 50px 0;
-            transition: background-color 0.3s;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 5px 15px var(--shadow-color);
-            transition: background-color 0.3s, box-shadow 0.3s;
-            border: 1px solid var(--border-color);
-        }
+        
+        /* Form Input Styles */
         .form-control {
             background-color: var(--input-bg);
             color: var(--text-color);
             border-color: var(--border-color);
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
+        
+        .form-control::placeholder {
+            color: var(--placeholder-color);
+            opacity: 1;
+        }
+        
         .form-control:focus {
             border-color: var(--youtube-red);
             box-shadow: 0 0 5px rgba(255, 0, 0, 0.3);
             background-color: var(--input-bg);
             color: var(--text-color);
         }
+        
         .input-group-text {
             background-color: var(--youtube-red);
             color: white;
             border-color: var(--border-color);
         }
-        .btn-youtube {
+        
+        /* Button Styles */
+        .btn-youtube, .download-btn, .copy-btn {
             background: var(--youtube-red);
-            border: none;
+            color: white;
             transition: all 0.3s;
         }
+        
         .btn-youtube:hover {
             background: var(--youtube-accent);
             transform: translateY(-2px);
@@ -305,14 +247,14 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <!-- Navbar with Theme Toggle -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="https://www.youtube.com/s/desktop/4b99a8ad/img/favicon_144.png" alt="YouTube Logo" onerror="this.src='https://www.youtube.com/favicon.ico';">
+            <a class="navbar-brand" href="#">
+                <img src="https://www.youtube.com/s/desktop/4b99a8ad/img/favicon_144.png" alt="YouTube Logo">
                 YouTube Downloader API
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -320,7 +262,6 @@
                     <li class="nav-item"><a class="nav-link" href="#status">Status</a></li>
                     <li class="nav-item"><a class="nav-link" href="#test">Test API</a></li>
                     <li class="nav-item"><a class="nav-link" href="#docs">Docs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="https://t.me/TheSmartDevs" target="_blank">Updates</a></li>
                 </ul>
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon" id="themeIcon"></i>
@@ -329,180 +270,54 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <h1><i class="fab fa-youtube me-2"></i> YouTube Downloader API</h1>
-            <p>Download YouTube videos and audio or search for videos with our fast API by <a href="https://t.me/ISmartCoder" target="_blank" class="text-white"><i class="fab fa-telegram-plane me-1"></i>@ISmartCoder</a>.</p>
-            <a href="#test" class="btn btn-youtube btn-lg mt-3">Try It Now</a>
-        </div>
-    </section>
-
-    <!-- API Status -->
-    <section id="status" class="py-5">
-        <div class="container">
-            <h2 class="text-center mb-4">API Status</h2>
-            <div class="status-card">
-                <i id="status-icon" class="fas fa-circle-notch fa-spin status-icon"></i>
-                <h3 id="status-text" class="status-text">Checking...</h3>
-                <p id="status-message">We're verifying the API's availability.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- API Test Box -->
-    <section id="test" class="form-section">
-        <div class="container">
-            <h2 class="text-center mb-4"><i class="fas fa-download me-2"></i> Test the API</h2>
-            <div class="form-container">
-                <h5 class="mb-3">Download Video</h5>
-                <form id="download-form">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fab fa-youtube"></i></span>
-                        <input type="url" class="form-control" id="youtube-url" placeholder="e.g., https://www.youtube.com/watch?v=pCr2XfPpWjU" required>
-                        <button type="submit" class="btn btn-youtube"><i class="fas fa-cloud-download-alt me-2"></i>Fetch Downloads</button>
+    <!-- Main Content -->
+    <div class="container my-5">
+        <!-- Video Downloads Section -->
+        <section id="downloads" class="mb-5">
+            <h2 class="mb-4"><i class="fas fa-download me-2"></i> Video Downloads</h2>
+            <div class="row">
+                <!-- Example Video Download Card -->
+                <div class="col-md-4 mb-4">
+                    <div class="card media-card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-file-video me-2"></i>WEBM - webm (480p)</h5>
+                            <p class="card-text text-muted">Size: Unknown</p>
+                            <a href="#" class="btn download-btn w-100">
+                                <i class="fas fa-download me-2"></i>Download
+                            </a>
+                        </div>
                     </div>
-                </form>
-                <div id="download-result"></div>
-
-                <h5 class="mt-4 mb-3">Search Videos</h5>
-                <form id="search-form">
-                    <div class="input-group mb-3">
-                        <span class="input-group-text"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" id="search-query" placeholder="e.g., python tutorial" required>
-                        <button type="submit" class="btn btn-youtube"><i class="fas fa-search me-2"></i>Search</button>
-                    </div>
-                </form>
-                <div id="search-result"></div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- API Documentation -->
-    <section id="docs" class="docs-section">
-        <div class="container">
-            <h2 class="text-center mb-4"><i class="fas fa-book me-2"></i> API Documentation</h2>
-            <div class="docs-card">
-                <h4>Download Endpoint</h4>
-                <p><code>GET /dl?url={youtube_url}</code></p>
-                <h5>Parameters</h5>
-                <ul>
-                    <li><strong>url</strong>: (Required) The YouTube video URL (e.g., <code>https://www.youtube.com/watch?v=pCr2XfPpWjU</code>)</li>
-                </ul>
-                <h5>Response</h5>
-                <p>Success (200):</p>
-                <pre>
-{
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
-    "title": "Video Title",
-    "thumbnail": "Thumbnail URL",
-    "thumbnail_url": "Fallback Thumbnail URL",
-    "url": "Download URL or YouTube URL",
-    "success": true,
-    "source": "youtube",
-    "author": "",
-    "medias": [
-        {
-            "formatId": 18,
-            "label": "mp4 (360p)",
-            "type": "video",
-            "ext": "mp4",
-            "quality": "mp4 (360p)",
-            "url": "Download URL",
-            "bitrate": 496367,
-            "clen": 123456789,
-            "mimeType": "video/mp4; codecs=\"avc1.42001E, mp4a.40.2\"",
-            "duration": 116
-        },
-        {
-            "formatId": 140,
-            "label": "m4a (137kb/s)",
-            "type": "audio",
-            "ext": "m4a",
-            "quality": "m4a (137kb/s)",
-            "url": "Download URL",
-            "bitrate": 136906,
-            "clen": 113199366,
-            "mimeType": "audio/mp4; codecs=\"mp4a.40.2\"",
-            "duration": 116
-        }
-    ],
-    "type": "multiple",
-    "error": false,
-    "time_end": 716
-}
-                </pre>
-                <p>Error (400 or 500):</p>
-                <pre>
-{
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
-    "error": "Error message",
-    "contact": "@ISmartCoder"
-}
-                </pre>
-                <h5>Example Request</h5>
-                <pre>GET /dl?url=https://www.youtube.com/watch?v=pCr2XfPpWjU</pre>
-
-                <h4>Search Endpoint</h4>
-                <p><code>GET /search?q={search_query}</code></p>
-                <h5>Parameters</h5>
-                <ul>
-                    <li><strong>q</strong>: (Required) The search query (e.g., <code>python tutorial</code>)</li>
-                </ul>
-                <h5>Response</h5>
-                <p>Success (200):</p>
-                <pre>
-{
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
-    "result": [
-        {
-            "title": "Video Title",
-            "imageUrl": "Thumbnail URL",
-            "link": "https://youtube.com/watch?v=video_id"
-        }
-    ]
-}
-                </pre>
-                <p>Error (400 or 500):</p>
-                <pre>
-{
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
-    "error": "Error message"
-}
-                </pre>
-                <h5>Example Request</h5>
-                <pre>GET /search?q=python+tutorial</pre>
-
-                <h4>Notes</h4>
-                <ul>
-                    <li>Ensure the YouTube URL is valid and properly formatted for the download endpoint.</li>
-                    <li>Search queries should be URL-encoded for special characters.</li>
-                    <li>For support, contact <a href="https://t.me/ISmartCoder" target="_blank"><i class="fab fa-telegram-plane me-1"></i>@ISmartCoder</a>.</li>
-                    <li>Stay updated via our <a href="https://t.me/TheSmartDevs" target="_blank"><i class="fab fa-telegram-plane me-1"></i>Telegram channel</a>.</li>
-                </ul>
+        <!-- Search/Download Form -->
+        <section id="test" class="mb-5">
+            <h2 class="mb-4"><i class="fas fa-search me-2"></i> Search & Download</h2>
+            <div class="card">
+                <div class="card-body">
+                    <form id="download-form" class="mb-4">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fab fa-youtube"></i></span>
+                            <input type="url" class="form-control" placeholder="Enter YouTube URL...">
+                            <button class="btn btn-youtube" type="submit">Download</button>
+                        </div>
+                    </form>
+                    
+                    <form id="search-form">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" placeholder="Search for videos...">
+                            <button class="btn btn-youtube" type="submit">Search</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>© 2025 YouTube Downloader API. All rights reserved.</p>
-            <p>Developed by <a href="https://t.me/ISmartCoder" target="_blank">@ISmartCoder</a> | Updates on <a href="https://t.me/TheSmartDevs" target="_blank">Telegram</a></p>
-            <div class="social-icons">
-                <a href="https://www.youtube.com/" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="https://t.me/ISmartCoder" target="_blank" title="Contact @ISmartCoder"><i class="fab fa-telegram-plane"></i></a>
-                <a href="https://t.me/TheSmartDevs" target="_blank" title="Join Updates Channel"><i class="fab fa-telegram"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS and Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS and Theme Toggle Script -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Theme Toggle Functionality
         const themeToggle = document.getElementById('themeToggle');
@@ -534,192 +349,7 @@
             }
         }
 
-        // Convert bytes to human-readable file size
-        function formatFileSize(bytes) {
-            if (!bytes) return 'Unknown';
-            const units = ['B', 'KB', 'MB', 'GB'];
-            let size = bytes;
-            let unitIndex = 0;
-            while (size >= 1024 && unitIndex < units.length - 1) {
-                size /= 1024;
-                unitIndex++;
-            }
-            return `${size.toFixed(2)} ${units[unitIndex]}`;
-        }
-
-        // Remove duplicate formats by formatId, keeping the one with highest bitrate or most recent lmt
-        function deduplicateFormats(medias) {
-            const seen = new Map();
-            medias.forEach(item => {
-                if (!seen.has(item.formatId) || (item.bitrate > seen.get(item.formatId).bitrate || item.lmt > seen.get(item.formatId).lmt)) {
-                    seen.set(item.formatId, item);
-                }
-            });
-            return Array.from(seen.values());
-        }
-
-        // API Status Checker
-        async function checkApiStatus() {
-            const statusIcon = document.getElementById('status-icon');
-            const statusText = document.getElementById('status-text');
-            const statusMessage = document.getElementById('status-message');
-            const testUrl = 'https://www.youtube.com/watch?v=pCr2XfPpWjU';
-
-            try {
-                const response = await fetch(`/dl?url=${encodeURIComponent(testUrl)}`, { timeout: 15000 });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const data = await response.json();
-
-                if (data.success && data.medias && data.medias.length > 0) {
-                    statusIcon.classList.remove('fa-circle-notch', 'fa-spin');
-                    statusIcon.classList.add('fa-check-circle');
-                    statusIcon.style.color = '#28a745';
-                    statusText.textContent = 'API Online';
-                    statusMessage.textContent = 'The API is fully operational and ready to use!';
-                } else {
-                    throw new Error(data.error || 'No download URLs found');
-                }
-            } catch (error) {
-                statusIcon.classList.remove('fa-circle-notch', 'fa-spin');
-                statusIcon.classList.add('fa-times-circle');
-                statusIcon.style.color = '#dc3545';
-                statusText.textContent = 'API Offline';
-                statusMessage.textContent = `Error: ${error.message}. Please try again later or contact @ISmartCoder.`;
-            }
-        }
-
-        // Download Form Submission
-        document.getElementById('download-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const urlInput = document.getElementById('youtube-url').value;
-            const resultDiv = document.getElementById('download-result');
-            resultDiv.style.display = 'none';
-            resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin me-2"></i>Loading...</p>';
-
-            try {
-                const response = await fetch(`/dl?url=${encodeURIComponent(urlInput)}`, { timeout: 15000 });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const data = await response.json();
-
-                if (data.success && data.medias && data.medias.length > 0) {
-                    let html = `<h5 class="mb-3">Results for "${data.title || 'Video'}"</h5>`;
-                    if (data.thumbnail || data.thumbnail_url) {
-                        html += `<img src="${data.thumbnail || data.thumbnail_url}" alt="Video Thumbnail" class="img-fluid rounded mb-3" style="max-width: 300px;">`;
-                    }
-
-                    // Deduplicate formats
-                    const uniqueMedias = deduplicateFormats(data.medias);
-
-                    // Group formats by type (video/audio)
-                    const videos = uniqueMedias.filter(m => m.type === 'video');
-                    const audios = uniqueMedias.filter(m => m.type === 'audio');
-
-                    // Video Downloads Section
-                    if (videos.length > 0) {
-                        html += `<div class="section-title"><i class="fas fa-video me-2"></i>Video Downloads</div>`;
-                        html += `<div class="row mb-4">`;
-                        videos.forEach(item => {
-                            const icon = item.ext === 'webm' ? 'fa-file-video' : 'fa-video';
-                            const fileSize = formatFileSize(item.clen);
-                            html += `
-                                <div class="col-md-4 col-sm-6 mb-3">
-                                    <div class="card media-card">
-                                        <div class="card-body">
-                                            <h6 class="card-title"><i class="fas ${icon} me-2"></i>${item.ext.toUpperCase()} - ${item.quality}</h6>
-                                            <p class="card-text text-muted">Size: ${fileSize}</p>
-                                            <a href="${item.url}" class="btn download-btn w-100" target="_blank"><i class="fas fa-download me-2"></i>Download ${item.quality}</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        html += `</div>`;
-                    }
-
-                    // Audio Downloads Section
-                    if (audios.length > 0) {
-                        html += `<div class="section-title"><i class="fas fa-music me-2"></i>Audio Downloads</div>`;
-                        html += `<div class="row">`;
-                        audios.forEach(item => {
-                            const icon = item.ext === 'opus' ? 'fa-file-audio' : 'fa-music';
-                            const fileSize = formatFileSize(item.clen);
-                            html += `
-                                <div class="col-md-4 col-sm-6 mb-3">
-                                    <div class="card media-card">
-                                        <div class="card-body">
-                                            <h6 class="card-title"><i class="fas ${icon} me-2"></i>${item.ext.toUpperCase()} - ${item.quality}</h6>
-                                            <p class="card-text text-muted">Size: ${fileSize}</p>
-                                            <a href="${item.url}" class="btn download-btn w-100" target="_blank"><i class="fas fa-download me-2"></i>Download ${item.quality}</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        html += `</div>`;
-                    }
-
-                    resultDiv.innerHTML = html;
-                } else {
-                    resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${data.error || 'No download URLs found'}</div>`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${error.message}</div>`;
-            }
-            resultDiv.style.display = 'block';
-        });
-
-        // Search Form Submission
-        document.getElementById('search-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const queryInput = document.getElementById('search-query').value;
-            const resultDiv = document.getElementById('search-result');
-            resultDiv.style.display = 'none';
-            resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin me-2"></i>Loading...</p>';
-
-            try {
-                const response = await fetch(`/search?q=${encodeURIComponent(queryInput)}`, { timeout: 15000 });
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const data = await response.json();
-
-                if (data.result && !data.error) {
-                    let html = `<h5 class="mb-3">Search Results for "${queryInput}"</h5>`;
-                    if (data.result.length === 0) {
-                        html += `<p>No videos found.</p>`;
-                    } else {
-                        html += `<div class="row">`;
-                        data.result.forEach(video => {
-                            html += `
-                                <div class="col-md-4 col-sm-6 mb-3">
-                                    <div class="card media-card">
-                                        <img src="${video.imageUrl || 'https://img.youtube.com/vi/default/hqdefault.jpg'}" alt="Video Thumbnail" class="card-img-top">
-                                        <div class="card-body">
-                                            <h6 class="card-title">${video.title || 'N/A'}</h6>
-                                            <button class="btn copy-btn w-100" onclick="navigator.clipboard.writeText('${video.link}').then(() => alert('Link copied!'))"><i class="fas fa-copy me-2"></i>Copy Link</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        html += `</div>`;
-                    }
-                    resultDiv.innerHTML = html;
-                } else {
-                    resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${data.error || 'No results found'}</div>`;
-                }
-            } catch (error) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${error.message}</div>`;
-            }
-            resultDiv.style.display = 'block';
-        });
-
-        // Run API status check on page load
-        window.onload = checkApiStatus;
+        // You can add more JavaScript functionality here
     </script>
 </body>
 </html>
