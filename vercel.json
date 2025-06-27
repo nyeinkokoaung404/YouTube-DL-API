@@ -2,17 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/app.py",
+      "src": "api.py",
       "use": "@vercel/python"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/app.py"
+      "dest": "api.py"
     }
-  ],
-  "env": {
-    "PYTHON_VERSION": "3.9"
-  }
+  ]
 }
