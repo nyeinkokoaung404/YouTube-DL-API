@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="YouTube Downloader API status page">
     <title>YouTube DL API Status</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -419,18 +420,18 @@
     <div class="container">
         <header>
             <div class="logo">
-                <i class="fab fa-youtube"></i>
+                <i class="fab fa-youtube" aria-hidden="true"></i>
                 <h1>YouTube DL API</h1>
             </div>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <i class="fas fa-moon" aria-hidden="true"></i>
             </button>
         </header>
 
-        <div class="status-card">
+        <section class="status-card">
             <div class="status-header">
                 <div class="status-icon">
-                    <i class="fas fa-check"></i>
+                    <i class="fas fa-check" aria-hidden="true"></i>
                 </div>
                 <div class="status-title">
                     <h2>API is Operational</h2>
@@ -440,7 +441,7 @@
             <div class="status-details">
                 <div class="detail-item">
                     <div class="detail-icon">
-                        <i class="fas fa-server"></i>
+                        <i class="fas fa-server" aria-hidden="true"></i>
                     </div>
                     <div class="detail-content">
                         <h3>Server Status</h3>
@@ -449,7 +450,7 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-icon">
-                        <i class="fas fa-bolt"></i>
+                        <i class="fas fa-bolt" aria-hidden="true"></i>
                     </div>
                     <div class="detail-content">
                         <h3>Response Time</h3>
@@ -458,7 +459,7 @@
                 </div>
                 <div class="detail-item">
                     <div class="detail-icon">
-                        <i class="fas fa-download"></i>
+                        <i class="fas fa-download" aria-hidden="true"></i>
                     </div>
                     <div class="detail-content">
                         <h3>Recent Usage</h3>
@@ -466,9 +467,9 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="api-docs">
+        <section class="api-docs">
             <h2>API Documentation</h2>
             <div class="endpoint">
                 <div class="endpoint-header">
@@ -484,9 +485,9 @@
                     <p><code>https://your-api-domain.com/dl?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ</code></p>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="test-section">
+        <section class="test-section">
             <h2>Test the API</h2>
             <div class="test-form">
                 <div class="input-group">
@@ -494,27 +495,27 @@
                     <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=..." value="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
                 </div>
                 <button id="testApiBtn" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i> Test API
+                    <i class="fas fa-rocket" aria-hidden="true"></i> Test API
                 </button>
             </div>
 
             <div class="loading" id="loadingIndicator">
-                <i class="fas fa-spinner"></i> Processing your request...
+                <i class="fas fa-spinner" aria-hidden="true"></i> Processing your request...
             </div>
 
             <div class="result-container" id="resultContainer">
                 <div class="result-card" id="resultCard">
                     <div class="result-header">
                         <div class="result-title" id="resultTitle">
-                            <i class="fas fa-check-circle result-icon"></i>
+                            <i class="fas fa-check-circle result-icon" aria-hidden="true"></i>
                             <span>API Response</span>
                         </div>
-                        <button id="downloadBtn" class="btn btn-success download-btn" disabled>
-                            <i class="fas fa-download"></i> Download
+                        <button id="downloadBtn" class="btn btn-success download-btn" disabled aria-label="Download video">
+                            <i class="fas fa-download" aria-hidden="true"></i> Download
                         </button>
                     </div>
                     <div class="video-info" id="videoInfo">
-                        <img src="" alt="Thumbnail" class="thumbnail" id="videoThumbnail">
+                        <img src="" alt="" class="thumbnail" id="videoThumbnail">
                         <div class="video-details">
                             <div class="video-title" id="videoTitle">Video Title</div>
                             <div id="videoUrl"></div>
@@ -523,7 +524,7 @@
                     <pre id="jsonResponse"></pre>
                 </div>
             </div>
-        </div>
+        </section>
 
         <footer>
             <p>© 2023 YouTube DL API | Created by @nkka404 | Updates: @premium_channel_404</p>
@@ -610,19 +611,21 @@
         function displayResults(data) {
             // Update UI with response data
             resultCard.className = 'result-card success';
-            resultTitle.innerHTML = '<i class="fas fa-check-circle result-icon"></i><span>API Response</span>';
+            resultTitle.innerHTML = '<i class="fas fa-check-circle result-icon" aria-hidden="true"></i><span>API Response</span>';
             
             // Video info
             if (data.thumbnail) {
                 videoThumbnail.src = data.thumbnail;
+                videoThumbnail.alt = data.title || 'Video thumbnail';
             } else if (data.thumbnail_url) {
                 videoThumbnail.src = data.thumbnail_url;
+                videoThumbnail.alt = data.title || 'Video thumbnail';
             }
             
             videoTitle.textContent = data.title || 'No title available';
             
             if (data.url) {
-                videoUrl.innerHTML = `<a href="${data.url}" target="_blank">${data.url}</a>`;
+                videoUrl.innerHTML = `<a href="${data.url}" target="_blank" rel="noopener noreferrer">${data.url}</a>`;
                 downloadBtn.disabled = false;
                 downloadBtn.onclick = () => {
                     window.open(data.url, '_blank');
@@ -641,7 +644,7 @@
 
         function showError(message) {
             resultCard.className = 'result-card error';
-            resultTitle.innerHTML = '<i class="fas fa-times-circle result-icon"></i><span>Error</span>';
+            resultTitle.innerHTML = '<i class="fas fa-times-circle result-icon" aria-hidden="true"></i><span>Error</span>';
             videoInfo.style.display = 'none';
             jsonResponse.textContent = message;
             downloadBtn.disabled = true;
