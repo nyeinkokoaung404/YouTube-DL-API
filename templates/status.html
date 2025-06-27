@@ -361,16 +361,6 @@
             margin-bottom: 5px;
         }
 
-        pre {
-            background-color: var(--bg);
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: monospace;
-            font-size: 0.85rem;
-            border: 1px solid var(--border);
-        }
-
         footer {
             text-align: center;
             margin-top: 40px;
@@ -470,6 +460,14 @@
             cursor: pointer;
         }
 
+        .resolution-thumbnail {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -507,6 +505,10 @@
             .search-result-thumbnail {
                 width: 100%;
                 height: auto;
+            }
+
+            .download-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -640,12 +642,12 @@
                         </div>
                     </div>
                     <div class="download-options" id="downloadOptions">
+                        <img src="" alt="Video Thumbnail" class="resolution-thumbnail" id="resolutionThumbnail">
                         <div class="download-options-title">Available Resolutions:</div>
                         <div class="download-buttons" id="downloadButtons">
                             <!-- Resolution buttons will be added here dynamically -->
                         </div>
                     </div>
-                    <pre id="jsonResponse"></pre>
                 </div>
             </div>
 
@@ -703,10 +705,10 @@
         const videoThumbnail = document.getElementById('videoThumbnail');
         const videoTitle = document.getElementById('videoTitle');
         const videoUrl = document.getElementById('videoUrl');
-        const jsonResponse = document.getElementById('jsonResponse');
         const downloadBtn = document.getElementById('downloadBtn');
         const downloadOptions = document.getElementById('downloadOptions');
         const downloadButtons = document.getElementById('downloadButtons');
+        const resolutionThumbnail = document.getElementById('resolutionThumbnail');
         const searchResults = document.getElementById('searchResults');
         const searchResultsList = document.getElementById('searchResultsList');
 
@@ -790,8 +792,10 @@
             // Video info
             if (data.thumbnail) {
                 videoThumbnail.src = data.thumbnail;
+                resolutionThumbnail.src = data.thumbnail;
             } else if (data.thumbnail_url) {
                 videoThumbnail.src = data.thumbnail_url;
+                resolutionThumbnail.src = data.thumbnail_url;
             }
             
             videoTitle.textContent = data.title || 'No title available';
@@ -807,30 +811,48 @@
                 downloadOptions.style.display = 'block';
                 downloadButtons.innerHTML = '';
                 
-                // Add resolution buttons (example resolutions - you should adapt to your API response)
-                const resolutions = [
-                    { label: '1080p', url: data.url + '&quality=1080' },
-                    { label: '720p', url: data.url + '&quality=720' },
-                    { label: '480p', url: data.url + '&quality=480' },
-                    { label: '360p', url: data.url + '&quality=360' },
-                    { label: 'Audio Only', url: data.url + '&audio=true' }
-                ];
-                
-                resolutions.forEach(res => {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn btn-sm resolution-btn';
-                    btn.textContent = res.label;
-                    btn.onclick = () => window.open(res.url, '_blank');
-                    downloadButtons.appendChild(btn);
-                });
+                // Check if we have resolution data in the API response
+                if (data.resolutions) {
+                    // Create buttons from the API response
+                    data.resolutions.forEach(res => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm resolution-btn';
+                        btn.textContent = res.quality;
+                        btn.onclick = () => window.open(res.url, '_blank');
+                        downloadButtons.appendChild(btn);
+                    });
+                } else if (data.formats) {
+                    // Alternative format if resolutions are in 'formats'
+                    data.formats.forEach(format => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm resolution-btn';
+                        btn.textContent = format.qualityLabel || format.mimeType;
+                        btn.onclick = () => window.open(format.url, '_blank');
+                        downloadButtons.appendChild(btn);
+                    });
+                } else {
+                    // Fallback to default resolutions if no data provided
+                    const resolutions = [
+                        { quality: '1080p', url: data.url + '&quality=1080' },
+                        { quality: '720p', url: data.url + '&quality=720' },
+                        { quality: '480p', url: data.url + '&quality=480' },
+                        { quality: '360p', url: data.url + '&quality=360' },
+                        { quality: 'Audio Only', url: data.url + '&audio=true' }
+                    ];
+                    
+                    resolutions.forEach(res => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm resolution-btn';
+                        btn.textContent = res.quality;
+                        btn.onclick = () => window.open(res.url, '_blank');
+                        downloadButtons.appendChild(btn);
+                    });
+                }
             } else {
                 videoUrl.textContent = 'No download URL available';
                 downloadBtn.disabled = true;
                 downloadOptions.style.display = 'none';
             }
-            
-            // Raw JSON response
-            jsonResponse.textContent = JSON.stringify(data, null, 2);
             
             // Show results
             resultContainer.style.display = 'block';
@@ -914,10 +936,20 @@
             resultTitle.innerHTML = '<i class="fas fa-times-circle result-icon"></i><span>Error</span>';
             videoInfo.style.display = 'none';
             downloadOptions.style.display = 'none';
-            jsonResponse.textContent = message;
             downloadBtn.disabled = true;
             resultContainer.style.display = 'block';
             searchResults.style.display = 'none';
+            
+            // Create a temporary element to display the error message
+            const errorDisplay = document.createElement('div');
+            errorDisplay.style.padding = '15px';
+            errorDisplay.style.color = 'var(--error)';
+            errorDisplay.textContent = message;
+            
+            // Clear any existing content and add the error message
+            resultCard.innerHTML = '';
+            resultCard.appendChild(resultTitle);
+            resultCard.appendChild(errorDisplay);
         }
     </script>
 </body>
