@@ -3,7 +3,7 @@
 # Channel: https://t.me/premium_channel_404
 ###########################################
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template, Response
 import requests
 import re
 import json
@@ -28,6 +28,13 @@ def extract_video_id(url):
     if query_match:
         return query_match.group(1)
     return None
+
+@app.route("/")
+def home():
+    try:
+        return render_template("status.html")
+    except Exception as e:
+        return f"Error loading template: {str(e)}", 500
 
 def fetch_video_data(video_id):
     url = f"https://www.youtube.com/watch?v={video_id}"
