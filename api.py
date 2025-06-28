@@ -3,18 +3,140 @@
 # Channel: https://t.me/premium_channel_404
 ###########################################
 
-from flask import Flask, request, jsonify, render_template, Response
-import requests
+from flask import Flask, request, jsonify, render_template, redirect
 import re
 import json
-from collections import OrderedDict
+from urllib.parse import quote
 
 app = Flask(__name__)
 
-# YouTube Data API Key
-YOUTUBE_API_KEY = "Get From Google AI Cloud"
-YOUTUBE_SEARCH_API_URL = "https://www.googleapis.com/youtube/v3/search"
-YOUTUBE_VIDEOS_API_URL = "https://www.googleapis.com/youtube/v3/videos"
+# HTML Interface
+@app.route('/')
+def home():
+    return render_template('status.html')
+
+# API Functions (same as your PHP logic)
+def parse_duration(seconds):
+    seconds = int(seconds)
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+
+    formatted = ""
+    if hours > 0: formatted += f"{hours}h "
+    if minutes > 0: formatted += f"{minutes}m "
+    if seconds > 0: formatted += f"{seconds}s"
+    return formatted.strip() or "0s"
+
+def fetch_video_data(video_id):
+    try:
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        response = requests.get(url)
+        html = response.text
+        
+        # Extract JSON data
+        match = re.search(r'var ytInitialPlayerResponse\s*=\s*({.*?});', html)
+        if not match:
+            return {"error": "Could not extract video data"}
+            
+        data = json.loads(match.group(1))
+        
+        video_details = data.get('videoDetails', {})
+        microformat = data.get('microformat', {}).get('playerMicroformatRenderer', {})
+        
+        # Get download links
+        download_links = get_download_links(video_id)
+        
+        response = {
+            "api_owner": "@nkka404",
+            "updates_channel": "@premium_channel_404",
+            "metadata": {
+                "title": video_details.get('title', 'Unknown'),
+                "channel": video_details.get('author', 'Unknown'),
+                "description": video_details.get('shortDescription', ''),
+                "viewCount": video_details.get('viewCount', '0'),
+                "duration": parse_duration(video_details.get('lengthSeconds', 0)),
+                "isLive": video_details.get('isLive', False),
+                "published": microformat.get('publishDate'),
+                "category": microformat.get('category')
+            },
+            "thumbnails": {
+                "default": f"https://img.youtube.com/vi/{video_id}/default.jpg",
+                "medium": f"https://img.youtube.com/vi/{video_id}/mqdefault.jpg",
+                "high": f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
+                "standard": f"https://img.youtube.com/vi/{video_id}/sddefault.jpg",
+                "maxres": f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+            },
+            "links": {
+                "watch": f"https://youtube.com/watch?v={video_id}",
+                "embed": f"https://youtube.com/embed/{video_id}"
+            }
+        }
+        
+        if download_links.get('url'):
+            response['download'] = download_links
+        elif download_links.get('error'):
+            response['error'] = download_links['error']
+            
+        return response
+        
+    except Exception as e:
+        return {"error": f"An error occurred: {str(e)}"}
+
+def get_download_links(video_id):
+    try:
+        url = f"https://www.youtube.com/watch?v={video_id}"
+        payload = json.dumps({"url": url})
+        headers = {'Content-Type': 'application/json'}
+        
+        response = requests.post("https://www.clipto.com/api/youtube", data=payload, headers=headers)
+        return response.json()
+    except Exception as e:
+        return {"error": f"Failed to fetch download links: {str(e)}"}
+
+def search_youtube(query):
+    try:
+        search_url = f"https://www.youtube.com/results?search_query={quote(query)}"
+        response = requests.get(search_url)
+        html = response.text
+        
+        match = re.search(r'var ytInitialData\s*=\s*({.*?});', html)
+        if not match:
+            return {"error": "Could not extract search data"}
+            
+        data = json.loads(match.group(1))
+        
+        results = []
+        contents = data.get('contents', {}).get('twoColumnSearchResultsRenderer', {}).get('primaryContents', {}).get('sectionListRenderer', {}).get('contents', [{}])[0].get('itemSectionRenderer', {}).get('contents', [])
+        
+        for item in contents:
+            if 'videoRenderer' not in item:
+                continue
+                
+            video = item['videoRenderer']
+            video_id = video.get('videoId', '')
+            
+            results.append({
+                "title": video.get('title', {}).get('runs', [{}])[0].get('text', 'Unknown'),
+                "videoId": video_id,
+                "channel": video.get('ownerText', {}).get('runs', [{}])[0].get('text', 'Unknown'),
+                "viewCount": video.get('viewCountText', {}).get('simpleText', 'N/A'),
+                "duration": video.get('lengthText', {}).get('simpleText', 'Live'),
+                "thumbnail": video.get('thumbnail', {}).get('thumbnails', [{}])[0].get('url', ''),
+                "links": {
+                    "watch": f"https://youtube.com/watch?v={video_id}",
+                    "embed": f"https://youtube.com/embed/{video_id}"
+                }
+            })
+        
+        return {
+            "api_owner": "@nkka404",
+            "updates_channel": "@premium_channel_404",
+            "results": results
+        }
+        
+    except Exception as e:
+        return {"error": f"Search failed: {str(e)}"}
 
 def extract_video_id(url):
     patterns = [
@@ -22,243 +144,76 @@ def extract_video_id(url):
         r'(?:https?:\/\/)?youtu\.be\/([^&?\s]+)',
         r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([^&?\s]+)',
         r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/v\/([^&?\s]+)',
-        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([^&?\s]+)'
+        r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([^&?\s]+)',
+        r'v=([^&?\s]+)'
     ]
+    
     for pattern in patterns:
-        match = re.match(pattern, url)
+        match = re.search(pattern, url)
         if match:
             return match.group(1)
-    
-    # Fallback attempt with regex search (if query params included)
-    query_match = re.search(r'v=([^&?\s]+)', url)
-    if query_match:
-        return query_match.group(1)
-
     return None
 
-def parse_duration(duration):
-    """Parse ISO 8601 duration into human-readable format without isodate."""
-    try:
-        # Match ISO 8601 duration (e.g., PT1H30M45S)
-        match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', duration)
-        if not match:
-            return "N/A"
-
-        hours = int(match.group(1) or 0)
-        minutes = int(match.group(2) or 0)
-        seconds = int(match.group(3) or 0)
-
-        formatted = ""
-        if hours > 0:
-            formatted += f"{hours}h "
-        if minutes > 0:
-            formatted += f"{minutes}m "
-        if seconds > 0:
-            formatted += f"{seconds}s"
-        return formatted.strip() or "0s"
-    except Exception:
-        return "N/A"
-
-def fetch_youtube_details(video_id):
-    """Fetch video details from YouTube Data API."""
-    try:
-        api_url = f"{YOUTUBE_VIDEOS_API_URL}?part=snippet,statistics,contentDetails&id={video_id}&key={YOUTUBE_API_KEY}"
-        response = requests.get(api_url)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch YouTube video details."}
-
-        data = response.json()
-        if not data.get('items'):
-            return {"error": "No video found for the provided ID."}
-
-        video = data['items'][0]
-        snippet = video['snippet']
-        stats = video['statistics']
-        content_details = video['contentDetails']
-
-        return {
-            "title": snippet.get('title', 'N/A'),
-            "channel": snippet.get('channelTitle', 'N/A'),
-            "description": snippet.get('description', 'N/A'),
-            "imageUrl": snippet.get('thumbnails', {}).get('high', {}).get('url', ''),
-            "duration": parse_duration(content_details.get('duration', '')),
-            "views": stats.get('viewCount', 'N/A'),
-            "likes": stats.get('likeCount', 'N/A'),
-            "comments": stats.get('commentCount', 'N/A')
-        }
-    except requests.exceptions.RequestException:
-        return {"error": "Failed to fetch YouTube video details."}
-
-def fetch_youtube_search(query):
-    """Fetch search results from YouTube Data API."""
-    try:
-        search_api_url = f"{YOUTUBE_SEARCH_API_URL}?part=snippet&q={requests.utils.quote(query)}&type=video&maxResults=10&key={YOUTUBE_API_KEY}"
-        search_response = requests.get(search_api_url)
-        if search_response.status_code != 200:
-            return {"error": "Failed to fetch search data."}
-
-        search_data = search_response.json()
-        video_ids = [item['id']['videoId'] for item in search_data.get('items', [])]
-
-        if not video_ids:
-            return {"error": "No videos found for the provided query."}
-
-        # Fetch additional video statistics and duration
-        videos_api_url = f"{YOUTUBE_VIDEOS_API_URL}?part=snippet,statistics,contentDetails&id={','.join(video_ids)}&key={YOUTUBE_API_KEY}"
-        videos_response = requests.get(videos_api_url)
-        if videos_response.status_code != 200:
-            return {"error": "Failed to fetch video details."}
-
-        videos_data = videos_response.json()
-        videos_map = {video['id']: video for video in videos_data.get('items', [])}
-
-        result = []
-        for item in search_data.get('items', []):
-            video_id = item['id']['videoId']
-            snippet = item['snippet']
-            video = videos_map.get(video_id, {})
-            content_details = video.get('contentDetails', {})
-            stats = video.get('statistics', {})
-
-            result.append({
-                "title": snippet.get('title', 'N/A'),
-                "channel": snippet.get('channelTitle', 'N/A'),
-                "imageUrl": snippet.get('thumbnails', {}).get('high', {}).get('url', ''),
-                "link": f"https://youtube.com/watch?v={video_id}",
-                "duration": parse_duration(content_details.get('duration', '')),
-                "views": stats.get('viewCount', 'N/A'),
-                "likes": stats.get('likeCount', 'N/A'),
-                "comments": stats.get('commentCount', 'N/A')
-            })
-
-        return result
-    except requests.exceptions.RequestException:
-        return {"error": "Failed to fetch search data."}
-
-@app.route("/")
-def home():
-    return render_template("status.html")
-
-@app.route("/dl", methods=["GET"])
-def download():
-    youtube_url = request.args.get("url", "").strip()
-    if not youtube_url:
-        return jsonify({
-            "error": "Missing 'url' parameter.",
-            "contact": "@nkka404"
-        }), 400
-
-    video_id = extract_video_id(youtube_url)
-    if not video_id:
-        return jsonify({
-            "error": "Invalid YouTube URL.",
-            "contact": "@nkka404"
-        }), 400
-
-    standard_url = f"https://www.youtube.com/watch?v={video_id}"
-    payload = {"url": standard_url}
-
-    # Fetch YouTube video details
-    youtube_data = fetch_youtube_details(video_id)
-    if "error" in youtube_data:
-        youtube_data = {
-            "title": "Unavailable",
-            "channel": "N/A",
-            "description": "N/A",
-            "imageUrl": f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg",
-            "duration": "N/A",
-            "views": "N/A",
-            "likes": "N/A",
-            "comments": "N/A"
-        }
-
-    # Fetch download URL from Clipto API
-    try:
-        response = requests.post("https://www.clipto.com/api/youtube", json=payload)
-        if response.status_code == 200:
-            data = response.json()
-            title = data.get("title", youtube_data["title"])
-            thumbnail = data.get("thumbnail", youtube_data["imageUrl"])
-            fallback_thumb = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
-            video_url = data.get("url", standard_url)
-
-            ordered = OrderedDict()
-            ordered["api_owner"] = "@nkka404"
-            ordered["updates_channel"] = "@premium_channel_404"
-            ordered["title"] = title
-            ordered["channel"] = youtube_data["channel"]
-            ordered["description"] = youtube_data["description"]
-            ordered["thumbnail"] = thumbnail
-            ordered["thumbnail_url"] = fallback_thumb
-            ordered["url"] = video_url
-            ordered["duration"] = youtube_data["duration"]
-            ordered["views"] = youtube_data["views"]
-            ordered["likes"] = youtube_data["likes"]
-            ordered["comments"] = youtube_data["comments"]
-
-            for key, value in data.items():
-                if key not in ordered:
-                    ordered[key] = value
-
-            return Response(json.dumps(ordered, ensure_ascii=False, indent=4), mimetype="application/json")
-        else:
-            ordered = OrderedDict()
-            ordered["api_owner"] = "@nkka404"
-            ordered["updates_channel"] = "@premium_channel_404"
-            ordered["เสียtitle"] = youtube_data["title"]
-            ordered["channel"] = youtube_data["channel"]
-            ordered["description"] = youtube_data["description"]
-            ordered["thumbnail"] = youtube_data["imageUrl"]
-            ordered["thumbnail_url"] = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
-            ordered["url"] = standard_url
-            ordered["duration"] = youtube_data["duration"]
-            ordered["views"] = youtube_data["views"]
-            ordered["likes"] = youtube_data["likes"]
-            ordered["comments"] = youtube_data["comments"]
-            ordered["error"] = "Failed to fetch download URL from Clipto API."
-
-            return Response(json.dumps(ordered, ensure_ascii=False, indent=4), mimetype="application/json"), 500
-    except requests.exceptions.RequestException:
-        ordered = OrderedDict()
-        ordered["api_owner"] = "@nkka404"
-        ordered["updates_channel"] = "@premium_channel_404"
-        ordered["title"] = youtube_data["title"]
-        ordered["channel"] = youtube_data["channel"]
-        ordered["description"] = youtube_data["description"]
-        ordered["thumbnail"] = youtube_data["imageUrl"]
-        ordered["thumbnail_url"] = f"https://img.youtube.com/vi/{video_id}/hqdefault.jpg"
-        ordered["url"] = standard_url
-        ordered["duration"] = youtube_data["duration"]
-        ordered["views"] = youtube_data["views"]
-        ordered["likes"] = youtube_data["likes"]
-        ordered["comments"] = youtube_data["comments"]
-        ordered["error"] = "Something went wrong. Please contact @ISmartCoder and report the bug."
-
-        return Response(json.dumps(ordered, ensure_ascii=False, indent=4), mimetype="application/json"), 500
-
-@app.route("/search", methods=["GET"])
-def search():
-    query = request.args.get("q", "").strip()
+# API Endpoint
+@app.route('/api')
+def api():
+    query = request.args.get('query', '')
+    action = request.args.get('action', 'info')
+    
     if not query:
         return jsonify({
-            "error": "Missing 'q' parameter.",
-            "contact": "@nkka404"
-        }), 400
-
-    search_data = fetch_youtube_search(query)
-    if "error" in search_data:
+            "status": False,
+            "message": "Query parameter is missing",
+            "usage": "Add ?query=YouTube_URL or ?query=search_terms&action=download|info|search"
+        })
+    
+    video_id = extract_video_id(query)
+    
+    if video_id:
+        if action == 'download':
+            download_links = get_download_links(video_id)
+            if 'error' in download_links:
+                return jsonify({
+                    "status": False,
+                    "message": download_links['error'],
+                    "request": {"type": "download", "id": video_id}
+                })
+            return jsonify({
+                "status": True,
+                "api_owner": "@nkka404",
+                "updates_channel": "@premium_channel_404",
+                "download": download_links
+            })
+        else:
+            video_data = fetch_video_data(video_id)
+            if 'error' in video_data:
+                return jsonify({
+                    "status": False,
+                    "message": video_data['error'],
+                    "request": {"type": "video", "id": video_id}
+                })
+            return jsonify({
+                "status": True,
+                "data": video_data
+            })
+    else:
+        search_data = search_youtube(query)
+        if 'error' in search_data:
+            return jsonify({
+                "status": False,
+                "message": search_data['error'],
+                "request": {"type": "search", "query": query}
+            })
         return jsonify({
-            "api_owner": "@nkka404",
-            "updates_channel": "@premium_channel_404",
-            "error": search_data["error"]
-        }), 500
+            "status": True,
+            "results": search_data
+        })
 
-    ordered = OrderedDict()
-    ordered["api_owner"] = "@nkka404"
-    ordered["updates_channel"] = "@premium_channel_404"
-    ordered["result"] = search_data
+# Vercel requires this
+@app.route('/favicon.ico')
+def favicon():
+    return '', 404
 
-    return Response(json.dumps(ordered, ensure_ascii=False, indent=4), mimetype="application/json")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
+    # app.run(debug=True)
     app.run(host="0.0.0.0", port=5000)
