@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Downloader API - @ISmartCoder</title>
+    <title>YouTube Downloader API - @nkka404</title>
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWixLrxjO8g8e4BHs3fI3pDVH6zT9iA2r2r3zL0B8X+0q0v0g8zL0B8X+0q0v0g8zL0B8X==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWixLrxjO8g8e4BHs3fI3pDVH6zT9iA2r2r3zL0B8X+0q0v0g8zL0B8X+0q0v0g8zL0B8X==" crossorigin="anonymous">
     <!-- Google Fonts: Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <!-- Favicon: YouTube Icon -->
@@ -116,11 +116,13 @@
         .btn-youtube {
             background: var(--youtube-red);
             border: none;
+            color: #FFF;
             transition: all 0.3s;
         }
         .btn-youtube:hover {
             background: var(--youtube-accent);
             transform: translateY(-2px);
+            color: #FFF;
         }
         .download-btn, .copy-btn {
             background: var(--youtube-red);
@@ -129,10 +131,12 @@
             padding: 10px 20px;
             transition: all 0.3s;
             font-size: 0.9rem;
+            border: none;
         }
         .download-btn:hover, .copy-btn:hover {
             background: var(--youtube-accent);
             transform: scale(1.05);
+            color: #FFF;
         }
         #download-result, #search-result {
             margin-top: 20px;
@@ -219,13 +223,20 @@
             .docs-card { padding: 20px; }
             .download-btn, .copy-btn { font-size: 0.8rem; padding: 8px 16px; }
         }
+        
+        .copy-success-message {
+            display: inline-block;
+            margin-left: 10px;
+            font-weight: bold;
+            color: #28a745; /* Green color for success */
+        }
     </style>
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand text-white" href="/">
                 <img src="https://www.youtube.com/s/desktop/4b99a8ad/img/favicon_144.png" alt="YouTube Logo" onerror="this.src='https://www.youtube.com/favicon.ico';">
                 YouTube Downloader API
             </a>
@@ -247,7 +258,7 @@
     <section class="hero">
         <div class="container">
             <h1><i class="fab fa-youtube me-2"></i> YouTube Downloader API</h1>
-            <p>Download YouTube videos and audio or search for videos with our fast API by <a href="https://t.me/ISmartCoder" target="_blank" class="text-white"><i class="fab fa-telegram-plane me-1"></i>@ISmartCoder</a>.</p>
+            <p>Download YouTube videos and audio or search for videos with our fast API by <a href="https://t.me/nkka404" target="_blank" class="text-white"><i class="fab fa-telegram-plane me-1"></i>@nkka404</a>.</p>
             <a href="#test" class="btn btn-youtube btn-lg mt-3">Try It Now</a>
         </div>
     </section>
@@ -307,8 +318,8 @@
                 <p>Success (200):</p>
                 <pre>
 {
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
+    "api_owner": "@nkka404",
+    "updates_channel": "@premium_channel_404",
     "title": "Video Title",
     "thumbnail": "Thumbnail URL",
     "thumbnail_url": "Fallback Thumbnail URL",
@@ -350,10 +361,10 @@
                 <p>Error (400 or 500):</p>
                 <pre>
 {
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
+    "api_owner": "@nkka404",
+    "updates_channel": "@premium_channel_404",
     "error": "Error message",
-    "contact": "@ISmartCoder"
+    "contact": "@nkka404"
 }
                 </pre>
                 <h5>Example Request</h5>
@@ -369,8 +380,8 @@
                 <p>Success (200):</p>
                 <pre>
 {
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
+    "api_owner": "@nkka404",
+    "updates_channel": "@premium_channel_404",
     "result": [
         {
             "title": "Video Title",
@@ -383,8 +394,8 @@
                 <p>Error (400 or 500):</p>
                 <pre>
 {
-    "api_owner": "@ISmartCoder",
-    "updates_channel": "@TheSmartDevs",
+    "api_owner": "@nkka404",
+    "updates_channel": "@premium_channel_404",
     "error": "Error message"
 }
                 </pre>
@@ -395,8 +406,8 @@
                 <ul>
                     <li>Ensure the YouTube URL is valid and properly formatted for the download endpoint.</li>
                     <li>Search queries should be URL-encoded for special characters.</li>
-                    <li>For support, contact <a href="https://t.me/ISmartCoder" target="_blank"><i class="fab fa-telegram-plane me-1"></i>@ISmartCoder</a>.</li>
-                    <li>Stay updated via our <a href="https://t.me/TheSmartDevs" target="_blank"><i class="fab fa-telegram-plane me-1"></i>Telegram channel</a>.</li>
+                    <li>For support, contact <a href="https://t.me/nkka404" target="_blank"><i class="fab fa-telegram-plane me-1"></i>@nkka404</a>.</li>
+                    <li>Stay updated via our <a href="https://t.me/premium_channel_404" target="_blank"><i class="fab fa-telegram-plane me-1"></i>Telegram channel</a>.</li>
                 </ul>
             </div>
         </div>
@@ -406,19 +417,24 @@
     <footer>
         <div class="container">
             <p>© 2025 YouTube Downloader API. All rights reserved.</p>
-            <p>Developed by <a href="https://t.me/ISmartCoder" target="_blank">@ISmartCoder</a> | Updates on <a href="https://t.me/TheSmartDevs" target="_blank">Telegram</a></p>
+            <p>Developed by <a href="https://t.me/nkka404" target="_blank">@nkka404</a> | Updates on <a href="https://t.me/premium_channel_404" target="_blank">Telegram</a></p>
             <div class="social-icons">
                 <a href="https://www.youtube.com/" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a>
-                <a href="https://t.me/ISmartCoder" target="_blank" title="Contact @ISmartCoder"><i class="fab fa-telegram-plane"></i></a>
-                <a href="https://t.me/TheSmartDevs" target="_blank" title="Join Updates Channel"><i class="fab fa-telegram"></i></a>
+                <a href="https://t.me/nkka404" target="_blank" title="Contact @nkka404"><i class="fab fa-telegram-plane"></i></a>
+                <a href="https://t.me/premium_channel_404" target="_blank" title="Join Updates Channel"><i class="fab fa-telegram"></i></a>
             </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS and Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // Convert bytes to human-readable file size
+        /**
+         * @fileoverview This script handles the client-side logic for the YouTube Downloader API page,
+         * including API status checks, form submissions, and dynamic content rendering.
+         */
+
+        // Convert bytes to a human-readable file size string.
         function formatFileSize(bytes) {
             if (!bytes) return 'Unknown';
             const units = ['B', 'KB', 'MB', 'GB'];
@@ -431,7 +447,7 @@
             return `${size.toFixed(2)} ${units[unitIndex]}`;
         }
 
-        // Remove duplicate formats by formatId, keeping the one with highest bitrate or most recent lmt
+        // Remove duplicate media formats, prioritizing the one with the highest bitrate.
         function deduplicateFormats(medias) {
             const seen = new Map();
             medias.forEach(item => {
@@ -442,48 +458,67 @@
             return Array.from(seen.values());
         }
 
-        // API Status Checker
+        // Check the API status by making a test request.
         async function checkApiStatus() {
             const statusIcon = document.getElementById('status-icon');
             const statusText = document.getElementById('status-text');
             const statusMessage = document.getElementById('status-message');
             const testUrl = 'https://www.youtube.com/watch?v=pCr2XfPpWjU';
+            
+            // Implement a timeout using AbortController
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
 
             try {
-                const response = await fetch(`/dl?url=${encodeURIComponent(testUrl)}`, { timeout: 15000 });
+                const response = await fetch(`/dl?url=${encodeURIComponent(testUrl)}`, { signal: controller.signal });
+                clearTimeout(timeoutId); // Clear the timeout if the fetch is successful
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
                 const data = await response.json();
 
                 if (data.success && data.medias && data.medias.length > 0) {
-                    statusIcon.classList.remove('fa-circle-notch', 'fa-spin');
+                    statusIcon.classList.remove('fa-circle-notch', 'fa-spin', 'fa-times-circle');
                     statusIcon.classList.add('fa-check-circle');
-                    statusIcon.style.color = '#28a745';
+                    statusIcon.style.color = '#28a745'; // Green
                     statusText.textContent = 'API Online';
                     statusMessage.textContent = 'The API is fully operational and ready to use!';
                 } else {
                     throw new Error(data.error || 'No download URLs found');
                 }
             } catch (error) {
-                statusIcon.classList.remove('fa-circle-notch', 'fa-spin');
+                clearTimeout(timeoutId);
+                // Handle aborted request or other network errors
+                if (error.name === 'AbortError') {
+                    statusMessage.textContent = `Error: Request timed out.`;
+                } else {
+                    statusMessage.textContent = `Error: ${error.message}. Please try again later or contact @nkka404.`;
+                }
+                
+                statusIcon.classList.remove('fa-circle-notch', 'fa-spin', 'fa-check-circle');
                 statusIcon.classList.add('fa-times-circle');
-                statusIcon.style.color = '#dc3545';
+                statusIcon.style.color = '#dc3545'; // Red
                 statusText.textContent = 'API Offline';
-                statusMessage.textContent = `Error: ${error.message}. Please try again later or contact @ISmartCoder.`;
             }
         }
 
-        // Download Form Submission
+        // Handle download form submission.
         document.getElementById('download-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const urlInput = document.getElementById('youtube-url').value;
             const resultDiv = document.getElementById('download-result');
-            resultDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
             resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin me-2"></i>Loading...</p>';
 
+            // Implement a timeout using AbortController
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
             try {
-                const response = await fetch(`/dl?url=${encodeURIComponent(urlInput)}`, { timeout: 15000 });
+                const response = await fetch(`/dl?url=${encodeURIComponent(urlInput)}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -495,10 +530,7 @@
                         html += `<img src="${data.thumbnail || data.thumbnail_url}" alt="Video Thumbnail" class="img-fluid rounded mb-3" style="max-width: 300px;">`;
                     }
 
-                    // Deduplicate formats
                     const uniqueMedias = deduplicateFormats(data.medias);
-
-                    // Group formats by type (video/audio)
                     const videos = uniqueMedias.filter(m => m.type === 'video');
                     const audios = uniqueMedias.filter(m => m.type === 'audio');
 
@@ -545,27 +577,36 @@
                         });
                         html += `</div>`;
                     }
-
                     resultDiv.innerHTML = html;
                 } else {
                     resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${data.error || 'No download URLs found'}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${error.message}</div>`;
+                clearTimeout(timeoutId);
+                let errorMessage = `Error: ${error.message}`;
+                if (error.name === 'AbortError') {
+                    errorMessage = `Error: Request timed out.`;
+                }
+                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${errorMessage}</div>`;
             }
-            resultDiv.style.display = 'block';
         });
 
-        // Search Form Submission
+        // Handle search form submission.
         document.getElementById('search-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const queryInput = document.getElementById('search-query').value;
             const resultDiv = document.getElementById('search-result');
-            resultDiv.style.display = 'none';
+            resultDiv.style.display = 'block';
             resultDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin me-2"></i>Loading...</p>';
 
+            // Implement a timeout using AbortController
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 seconds timeout
+
             try {
-                const response = await fetch(`/search?q=${encodeURIComponent(queryInput)}`, { timeout: 15000 });
+                const response = await fetch(`/search?q=${encodeURIComponent(queryInput)}`, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -578,13 +619,15 @@
                     } else {
                         html += `<div class="row">`;
                         data.result.forEach(video => {
+                            // Using a data attribute to store the link
                             html += `
                                 <div class="col-md-4 col-sm-6 mb-3">
                                     <div class="card media-card">
                                         <img src="${video.imageUrl || 'https://img.youtube.com/vi/default/hqdefault.jpg'}" alt="Video Thumbnail" class="card-img-top">
                                         <div class="card-body">
                                             <h6 class="card-title">${video.title || 'N/A'}</h6>
-                                            <button class="btn copy-btn w-100" onclick="navigator.clipboard.writeText('${video.link}').then(() => alert('Link copied!'))"><i class="fas fa-copy me-2"></i>Copy Link</button>
+                                            <button class="btn copy-btn w-100" data-link="${video.link}"><i class="fas fa-copy me-2"></i>Copy Link</button>
+                                            <span class="copy-success-message"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -597,9 +640,39 @@
                     resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${data.error || 'No results found'}</div>`;
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>Error: ${error.message}</div>`;
+                clearTimeout(timeoutId);
+                let errorMessage = `Error: ${error.message}`;
+                if (error.name === 'AbortError') {
+                    errorMessage = `Error: Request timed out.`;
+                }
+                resultDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-circle me-2"></i>${errorMessage}</div>`;
             }
-            resultDiv.style.display = 'block';
+        });
+
+        // Event listener for dynamically created copy buttons
+        document.getElementById('search-result').addEventListener('click', (e) => {
+            if (e.target.classList.contains('copy-btn')) {
+                const button = e.target;
+                const link = button.dataset.link;
+                const messageSpan = button.nextElementSibling;
+                
+                // Copy the link to the clipboard
+                navigator.clipboard.writeText(link)
+                    .then(() => {
+                        // Display a success message
+                        messageSpan.textContent = "Copied!";
+                        setTimeout(() => {
+                            messageSpan.textContent = "";
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy link: ', err);
+                        messageSpan.textContent = "Failed to copy.";
+                        setTimeout(() => {
+                            messageSpan.textContent = "";
+                        }, 2000);
+                    });
+            }
         });
 
         // Run API status check on page load
