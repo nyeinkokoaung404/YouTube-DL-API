@@ -288,7 +288,7 @@ def download():
 
             "error": "Missing 'url' parameter.",
 
-            "contact": "@ISmartCoder"
+            "contact": "@nkka404"
 
         }), 400
 
@@ -302,7 +302,7 @@ def download():
 
             "error": "Invalid YouTube URL.",
 
-            "contact": "@ISmartCoder"
+            "contact": "@nkka404"
 
         }), 400
 
@@ -364,9 +364,9 @@ def download():
 
             ordered = OrderedDict()
 
-            ordered["api_owner"] = "@ISmartCoder"
+            ordered["api_owner"] = "@nkka404"
 
-            ordered["updates_channel"] = "@TheSmartDevs"
+            ordered["updates_channel"] = "@nkka404"
 
             ordered["title"] = title
 
@@ -404,9 +404,9 @@ def download():
 
             ordered = OrderedDict()
 
-            ordered["api_owner"] = "@ISmartCoder"
+            ordered["api_owner"] = "@nkka404"
 
-            ordered["updates_channel"] = "@TheSmartDevs"
+            ordered["updates_channel"] = "@nkka404"
 
             ordered["title"] = youtube_data["title"]
 
@@ -438,9 +438,9 @@ def download():
 
         ordered = OrderedDict()
 
-        ordered["api_owner"] = "@ISmartCoder"
+        ordered["api_owner"] = "@nkka404"
 
-        ordered["updates_channel"] = "@TheSmartDevs"
+        ordered["updates_channel"] = "@nkka404"
 
         ordered["title"] = youtube_data["title"]
 
@@ -482,7 +482,7 @@ def search():
 
             "error": "Missing 'q' parameter.",
 
-            "contact": "@ISmartCoder"
+            "contact": "@nkka404"
 
         }), 400
 
@@ -496,9 +496,9 @@ def search():
 
         return jsonify({
 
-            "api_owner": "@ISmartCoder",
+            "api_owner": "@nkka404",
 
-            "updates_channel": "@TheSmartDevs",
+            "updates_channel": "@nkka404",
 
             "error": search_data["error"]
 
@@ -508,9 +508,9 @@ def search():
 
     ordered = OrderedDict()
 
-    ordered["api_owner"] = "@ISmartCoder"
+    ordered["api_owner"] = "@nkka404"
 
-    ordered["updates_channel"] = "@TheSmartDevs"
+    ordered["updates_channel"] = "@nkka404"
 
     ordered["result"] = search_data
 
