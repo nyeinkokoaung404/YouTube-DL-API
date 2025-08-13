@@ -462,7 +462,7 @@ def download():
 
         ordered["comments"] = youtube_data["comments"]
 
-        ordered["error"] = "Something went wrong. Please contact @ISmartCoder and report the bug."
+        ordered["error"] = "Something went wrong. Please contact @nkka404 and report the bug."
 
 
 
